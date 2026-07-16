@@ -4,137 +4,104 @@ let songData = null, currentSectionIndex = 0, audioObj = null;
 
 const ui = {
   appContent: document.getElementById('app-content'),
-  status: document.getElementById('teacher-status'),
-  title: document.getElementById('section-title'),
-  lyrics: document.getElementById('section-lyrics'),
-  aiResponse: document.getElementById('ai-response'),
   btnPlay: document.getElementById('btn-play'),
   btnMic: document.getElementById('btn-mic'),
   btnNext: document.getElementById('btn-next'),
+  aiResponse: document.getElementById('ai-response'),
+  title: document.getElementById('section-title'),
+  lyrics: document.getElementById('section-lyrics'),
   sun: document.querySelector('.sun')
 };
 
 async function init() {
-  try {
-    const res = await fetch('lyrics.json');
-    songData = await res.json();
-    audioObj = new Audio(songData.audio);
-    
-    audioObj.onerror = () => {
-        ui.status.innerText = "Error: File song.mp3 not found. / 找不到 song.mp3";
-    };
+  const res = await fetch('lyrics.json');
+  songData = await res.json();
+  audioObj = new Audio(songData.audio);
+  
+  // Set global audio behavior
+  audioObj.onended = () => {
+    ui.btnPlay.innerText = "Play / 播放";
+    ui.btnPlay.disabled = false;
+    ui.btnNext.disabled = false; // ONLY enable now
+    ui.btnNext.classList.add('color-unlocked');
+  };
 
-    ui.status.style.display = 'none';
-    ui.appContent.style.display = 'grid';
-    loadSection(0);
-  } catch (e) { 
-    ui.status.innerText = "Error loading data. / 載入錯誤。"; 
-    console.error(e);
-  }
+  ui.appContent.style.display = 'grid';
+  loadSection(0);
 }
 
 function loadSection(index) {
   const section = songData.sections[index];
-  ui.title.innerText = "Part " + (index + 1) + " / 第一部分";
-  ui.lyrics.innerText = section.lyrics;
-  ui.btnNext.innerText = "Unlock Next Color (" + (index + 1) + "/5) / 解鎖下一個顏色";
-  ui.btnNext.disabled = true;
+  // Reset UI
+  ui.btnNext.disabled = true; // LOCK the button
   ui.btnNext.classList.remove('color-unlocked');
-  ui.sun.style.background = "radial-gradient(circle, #fff 0%, " + rainbowColors[index] + " 70%)";
+  ui.btnPlay.disabled = false;
+  
+  ui.title.innerText = `Part ${index + 1} / 第一部分`;
+  ui.lyrics.innerText = section.lyrics;
+  ui.sun.style.background = `radial-gradient(circle, #fff 0%, ${rainbowColors[index]} 70%)`;
 
-  speak("Hello. Let us talk about the lyrics: " + section.lyrics.substring(0, 50) + ". " + section.memory_prompt);
+  // The Teacher teaches immediately
+  const intro = `Welcome to part ${index + 1}. ${section.chineseFunFact} ${section.memory_prompt}`;
+  speak(intro);
 }
 
+// PLAY BUTTON: Only plays audio
 ui.btnPlay.onclick = () => {
   const section = songData.sections[currentSectionIndex];
   audioObj.currentTime = section.start;
   audioObj.play();
-  ui.btnPlay.innerText = "Playing... / 播放中...";
-  ui.btnPlay.disabled = true;
-  
-  setTimeout(() => { 
-      audioObj.pause(); 
-      ui.btnNext.disabled = false; 
-      ui.btnPlay.innerText = "Play Section / 播放片段";
-      ui.btnPlay.disabled = false;
-  }, (section.end - section.start) * 1000);
+  ui.btnPlay.disabled = true; // Cannot spam play
+  ui.btnNext.disabled = true; // Cannot skip while playing
 };
 
-ui.btnNext.onclick = () => {
-  const arcPath = document.getElementById("arc-" + currentSectionIndex);
-  arcPath.style.stroke = rainbowColors[currentSectionIndex];
-  arcPath.classList.add('animate-fill');
+// MIC BUTTON: Only for Singing/Speaking
+ui.btnMic.onclick = () => {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) return alert("Not supported");
+  const rec = new SpeechRecognition();
+  rec.lang = 'en-US';
+  ui.aiResponse.innerText = "Listening... / 聆聽中...";
+  rec.start();
+  rec.onresult = (e) => sendToAI(e.results[0][0].transcript);
+};
 
-  currentSectionIndex++;
+// NEXT BUTTON: Transitions only
+ui.btnNext.onclick = () => {
+  document.getElementById(`arc-${currentSectionIndex}`).style.stroke = rainbowColors[currentSectionIndex];
+  document.getElementById(`arc-${currentSectionIndex}`).classList.add('animate-fill');
   
+  currentSectionIndex++;
   if (currentSectionIndex < songData.sections.length) {
-      setTimeout(() => loadSection(currentSectionIndex), 1500);
+    loadSection(currentSectionIndex);
   } else {
-      ui.btnNext.innerText = "Song Finished! / 歌曲結束！";
-      ui.btnNext.classList.add('color-unlocked');
-      ui.btnNext.disabled = true;
-      speak("You have completed the whole song. Well done. / 你完成了整首歌。做得好。");
+    speak("Congratulations, you finished the song! / 恭喜，你完成了這首歌！");
+    ui.btnNext.innerText = "Finished / 完成";
   }
 };
 
 async function sendToAI(userText) {
-  ui.aiResponse.innerText = "Teacher is thinking... / 老師正在思考...";
-  
-  const backupResponses = [
-    "That is a wonderful thought. Tell me more about it.",
-    "I love hearing your perspective on that.",
-    "That sounds very special. Please continue.",
-    "I am listening. What else is on your mind?"
-  ];
-
+  ui.aiResponse.innerText = "Teacher is listening... / 老師正在聽...";
   try {
-    const section = songData.sections[currentSectionIndex];
     const res = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        userMessage: userText,
-        sectionLyrics: section.lyrics,
-        memoryPrompt: section.memory_prompt,
-        chineseFunFact: section.chineseFunFact
+      body: JSON.stringify({ 
+        userMessage: `The user sang: ${userText}`, 
+        sectionLyrics: songData.sections[currentSectionIndex].lyrics 
       })
     });
-    
-    if (!res.ok) throw new Error("API failed");
     const data = await res.json();
-    speak(data.reply);
+    speak("Great effort! " + data.reply);
   } catch (err) {
-    console.error(err);
-    const fallback = backupResponses[Math.floor(Math.random() * backupResponses.length)];
-    speak(fallback + " (I am having trouble connecting to my brain right now, but you are doing great!)");
+    speak("I heard you! That was lovely.");
   }
 }
 
 function speak(text) {
   ui.aiResponse.innerText = text;
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.rate = 0.9;
-  utterance.lang = 'en-US';
   window.speechSynthesis.speak(utterance);
 }
 
-function setupSpeechRecognition() {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-        const rec = new SpeechRecognition();
-        rec.lang = 'en-US';
-        ui.btnMic.onclick = () => {
-            ui.aiResponse.innerText = "Listening... / 聆聽中...";
-            rec.start();
-        };
-        rec.onresult = (e) => sendToAI(e.results[0][0].transcript);
-    } else {
-        ui.btnMic.innerText = "Mic Not Supported / 不支援麥克風";
-        ui.btnMic.disabled = true;
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    init();
-    setupSpeechRecognition();
-});
+document.addEventListener('DOMContentLoaded', init);
