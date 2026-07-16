@@ -1,5 +1,4 @@
-const API_URL = '/api/chat'; // Relative path for Vercel
-// Reversed colors so bottom arc (Part 1) unlocks first visually
+const API_URL = '/api/chat';
 const rainbowColors = ['#e67e22', '#f1c40f', '#2ecc71', '#3498db', '#9b59b6']; 
 let songData = null, currentSectionIndex = 0, audioObj = null;
 
@@ -23,32 +22,27 @@ async function init() {
     
     audioObj.onerror = () => {
         ui.status.innerText = "Error: File song.mp3 not found.";
-        console.error("Audio loading failed.");
     };
 
     ui.status.style.display = 'none';
-    ui.appContent.style.display = 'grid'; // Match CSS display
+    ui.appContent.style.display = 'grid';
     loadSection(0);
-    setupSpeechRecognition();
   } catch (e) { 
-    ui.status.innerText = "Error loading data. Check console."; 
+    ui.status.innerText = "Error loading data."; 
     console.error(e);
   }
 }
 
 function loadSection(index) {
   const section = songData.sections[index];
-  ui.title.innerText = `Part ${index + 1}`;
+  ui.title.innerText = "Part " + (index + 1);
   ui.lyrics.innerText = section.lyrics;
-  ui.btnNext.innerText = `Unlock Next Color (${index + 1}/5)`;
+  ui.btnNext.innerText = "Unlock Next Color (" + (index + 1) + "/5)";
   ui.btnNext.disabled = true;
   ui.btnNext.classList.remove('color-unlocked');
-  
-  // Set the initial color for the sun to match current section's rainbow part
-  ui.sun.style.background = `radial-gradient(circle, #fff 0%, ${rainbowColors[index]} 70%)`;
+  ui.sun.style.background = "radial-gradient(circle, #fff 0%, " + rainbowColors[index] + " 70%)";
 
-  // Initial greeting from the teacher
-  speak(`Hello! Let's talk about the lyrics: "${section.lyrics.substring(0,50)}..." ${section.memory_prompt}`);
+  speak("Hello. Let us talk about the lyrics: " + section.lyrics.substring(0, 50) + ". " + section.memory_prompt);
 }
 
 ui.btnPlay.onclick = () => {
@@ -58,7 +52,6 @@ ui.btnPlay.onclick = () => {
   ui.btnPlay.innerText = "Playing...";
   ui.btnPlay.disabled = true;
   
-  // Pause automatically after duration
   setTimeout(() => { 
       audioObj.pause(); 
       ui.btnNext.disabled = false; 
@@ -68,22 +61,19 @@ ui.btnPlay.onclick = () => {
 };
 
 ui.btnNext.onclick = () => {
-  // 1. Animate the corresponding SVG path
-  const arcPath = document.getElementById(`arc-${currentSectionIndex}`);
+  const arcPath = document.getElementById("arc-" + currentSectionIndex);
   arcPath.style.stroke = rainbowColors[currentSectionIndex];
   arcPath.classList.add('animate-fill');
 
-  // 2. Move to next section
   currentSectionIndex++;
   
   if (currentSectionIndex < songData.sections.length) {
-      // Small delay before loading next lyrics so animation can be seen
       setTimeout(() => loadSection(currentSectionIndex), 1500);
   } else {
       ui.btnNext.innerText = "Song Finished!";
       ui.btnNext.classList.add('color-unlocked');
       ui.btnNext.disabled = true;
-      speak("You have completed the whole song! Wonderful singing.");
+      speak("You have completed the whole song. Well done.");
   }
 };
 
@@ -99,4 +89,43 @@ async function sendToAI(userText) {
         userMessage: userText,
         sectionLyrics: section.lyrics,
         memoryPrompt: section.memory_prompt,
-        chineseFun
+        chineseFunFact: section.chineseFunFact
+      })
+    });
+    
+    const data = await res.json();
+    speak(data.reply);
+  } catch (err) {
+    console.error(err);
+    speak("I am having trouble thinking right now, but you are doing wonderfully.");
+  }
+}
+
+function speak(text) {
+  ui.aiResponse.innerText = text;
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = 0.9;
+  utterance.lang = 'en-US'; // Set to native English
+  window.speechSynthesis.speak(utterance);
+}
+
+function setupSpeechRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+        const rec = new SpeechRecognition();
+        rec.lang = 'en-US'; // Expecting English input from the user
+        ui.btnMic.onclick = () => {
+            ui.aiResponse.innerText = "Listening...";
+            rec.start();
+        };
+        rec.onresult = (e) => sendToAI(e.results[0][0].transcript);
+    } else {
+        ui.btnMic.innerText = "Mic Not Supported";
+        ui.btnMic.disabled = true;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    init();
+    setupSpeechRecognition();
+});
