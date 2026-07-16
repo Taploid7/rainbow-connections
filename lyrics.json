@@ -14,14 +14,14 @@
     {
       "id": 2,
       "name": "Verse 2 (第二段)",
-      "start": 70.635,
+      "start": 80,
       "end": 91,
-      "lyrics": "And someone believed it. And look what it's done so far. What's so amazing that keeps us stargazing?",
+      "lyrics": "What's so amazing that keeps us stargazing? And what do we think we might see?",
       "funFact": "觀星就像在進行時間旅行！因為星星離我們太遠，我們現在看到的星光是來自多年前的。",
       "memory_prompt": "Did you ever stargaze when you were younger?"
     },
     {
-      "id": 3,
+      "id": 5,
       "name": "Chorus (副歌)",
       "start": 92.54,
       "end": 98,
@@ -32,14 +32,14 @@
     {
       "id": 4,
       "name": "Bridge (過門)",
-      "start": 107.56,
-      "end": 115,
+      "start": 95,
+      "end": 113,
       "lyrics": "All of us under its spell. We know that it's probably magic.",
       "funFact": "魔法本質上就是我們尚未完全理解的科學。古人常將彩虹的形成視為一種神祕力量。",
       "memory_prompt": "Do you remember a time when something felt truly magical?"
     },
     {
-      "id": 5,
+      "id": 3,
       "name": "Verse 3 (第三段)",
       "start": 114.2,
       "end": 137,
