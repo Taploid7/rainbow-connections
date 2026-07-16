@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rainbow Song Teacher</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Rainbow Song Teacher</h1>
+      <p id="teacher-status">Loading our song today...</p>
+    </header>
+
+    <div class="rainbow-container">
+      <svg viewBox="0 0 200 100" class="rainbow-svg">
+        <path id="arc-4" d="M 10 100 A 90 90 0 0 1 190 100" class="arc" />
+        <path id="arc-3" d="M 30 100 A 70 70 0 0 1 170 100" class="arc" />
+        <path id="arc-2" d="M 50 100 A 50 50 0 0 1 150 100" class="arc" />
+        <path id="arc-1" d="M 70 100 A 30 30 0 0 1 130 100" class="arc" />
+        <path id="arc-0" d="M 90 100 A 10 10 0 0 1 110 100" class="arc" />
+      </svg>
+    </div>
+
+    <main id="app-content" style="display: none;">
+      <div class="card current-section">
+        <h2 id="section-title">Section Title</h2>
+        <p id="section-lyrics" class="lyrics-display">Lyrics will appear here</p>
+        
+        <div class="controls">
+          <button id="btn-play" class="btn primary">🎵 Play Music</button>
+          <button id="btn-mic" class="btn secondary">🎤 Speak to Teacher</button>
+        </div>
+      </div>
+
+      <div class="card ai-teacher">
+        <h3>Teacher says:</h3>
+        <p id="ai-response">Hello! I am so happy to sing with you today. Let's start by listening to the music.</p>
+        <button id="btn-next" class="btn success" disabled>⭐ Complete & Unlock Color</button>
+      </div>
+    </main>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
