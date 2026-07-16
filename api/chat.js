@@ -12,16 +12,13 @@ export default async function handler(req, res) {
 
   try {
     const { userMessage, sectionLyrics, memoryPrompt } = req.body;
-    const systemPrompt = `You are a gentle, warm choir teacher. 
-    1. Validate memories and encourage the elderly participant.
-    2. NEVER criticize singing/speaking. 
-    3. Keep responses short (2-3 sentences).
-    Current Lyrics: "${sectionLyrics}"
-    Topic: "${memoryPrompt}"`;
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", systemInstruction: systemPrompt });
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-1.5-flash",
+      systemInstruction: `You are a gentle, warm choir teacher. Guide an elderly participant. Validate memories. NEVER criticize singing. Keep responses 2-3 sentences. Current Lyrics: "${sectionLyrics}" | Topic: "${memoryPrompt}"`
+    });
+
     const result = await model.generateContent(userMessage);
-    
     res.status(200).json({ reply: result.response.text() });
   } catch (error) {
     console.error(error);

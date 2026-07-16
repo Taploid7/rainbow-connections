@@ -1,5 +1,5 @@
 {
-  "name": "rainbow-ai-game",
+  "name": "rainbow-connections",
   "version": "1.0.0",
   "dependencies": {
     "@google/generative-ai": "^0.21.0"
