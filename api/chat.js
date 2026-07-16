@@ -1,6 +1,7 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+// Initialize the client
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export default async function handler(req, res) {
   // CORS Headers
@@ -21,16 +22,17 @@ export default async function handler(req, res) {
     Current Lyrics: "${sectionLyrics}"
     Topic: "${memoryPrompt}"`;
 
-    const result = await ai.models.generateContent({
-      model: 'gemini-1.5-flash',
-      contents: userMessage,
-      config: {
-        systemInstruction: systemPrompt,
-        temperature: 0.7
-      }
+    // Initialize the model with the system instruction
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-1.5-flash",
+      systemInstruction: systemPrompt 
     });
 
-    res.status(200).json({ reply: result.text });
+    const result = await model.generateContent(userMessage);
+    const response = await result.response;
+    const text = response.text();
+
+    res.status(200).json({ reply: text });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to generate response' });
