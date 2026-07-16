@@ -6,7 +6,7 @@
       "id": 1,
       "name": "Verse 1",
       "start": 2.8,
-      "end": 13.04,
+      "end": 15,
       "lyrics": "Why are there so many songs about rainbows? What's on the other side?",
       "difficulty": "easy",
       "memory_prompt": "Have you ever seen a double rainbow? What do rainbows make you think of?"
@@ -15,7 +15,7 @@
       "id": 2,
       "name": "Verse 2",
       "start": 70.635,
-      "end": 89.98,
+      "end": 91,
       "lyrics": "And someone believed it. And look what it's done so far. What's so amazing that keeps us stargazing? And what do we think we might see?",
       "difficulty": "easy",
       "memory_prompt": "Did you ever stargaze when you were younger? Who were you with?"
@@ -24,7 +24,7 @@
       "id": 3,
       "name": "Chorus",
       "start": 92.54,
-      "end": 96.62,
+      "end": 98,
       "lyrics": "Someday we'll find it, the rainbow connection. The lovers, the dreamers and me.",
       "difficulty": "medium",
       "memory_prompt": "Who is the biggest dreamer you've ever known?"
@@ -33,7 +33,7 @@
       "id": 4,
       "name": "Bridge",
       "start": 107.56,
-      "end": 113.08,
+      "end": 115,
       "lyrics": "All of us under its spell. We know that it's probably magic.",
       "difficulty": "medium",
       "memory_prompt": "Do you remember a time when something felt truly magical?"
@@ -42,7 +42,7 @@
       "id": 5,
       "name": "Verse 3",
       "start": 114.2,
-      "end": 135.99,
+      "end": 137,
       "lyrics": "Have you been half asleep? And have you heard voices? I've heard them calling my name. Is this the sweet sound that calms the young sailors? The voice might be one in the...",
       "difficulty": "easy",
       "memory_prompt": "What sweet sounds or music always bring you comfort?"

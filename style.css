@@ -1,100 +1,191 @@
 :root {
-  --bg-color: #f9f7f1;
-  --text-color: #2c3e50;
-  --card-bg: #ffffff;
-  --primary: #4a90e2;
-  --secondary: #e67e22;
-  --success: #27ae60;
-  --gray: #bdc3c7;
+  --bg-color: #fdfcf0; /* Soft cream background */
+  --text-dark: #333;
+  --primary-color: #4a90e2; /* Nice blue for buttons */
+  --success-color: #2ecc71; /* Green for unlock */
+  
+  /* Rainbow Colors defined */
+  --color-0: #9b59b6; /* Purple */
+  --color-1: #3498db; /* Blue */
+  --color-2: #2ecc71; /* Green */
+  --color-3: #f1c40f; /* Yellow */
+  --color-4: #e67e22; /* Orange */
+  --color-grey: #bdc3c7;
 }
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: var(--bg-color);
-  color: var(--text-color);
-  line-height: 1.6;
+  color: var(--text-dark);
   margin: 0;
   padding: 20px;
-  font-size: 1.2rem;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
 }
 
-.container {
+.app-wrapper {
   max-width: 800px;
-  margin: 0 auto;
-  text-align: center;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-h1 { font-size: 2.5rem; color: var(--primary); }
-h2 { font-size: 2rem; margin-bottom: 10px; }
-h3 { font-size: 1.5rem; color: var(--text-color); }
+header {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+header h1 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 2.5rem;
+}
+
+/* Rainbow Container */
+.rainbow-ui-container {
+    position: relative;
+    height: 220px; /* Enough space for rainbow */
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    margin-bottom: -30px;
+}
+
+/* Sun Animation */
+.sun {
+    position: absolute;
+    top: 20px;
+    right: 50px;
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle, #ffe082 60%, #ffca28 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 30px #ffca28;
+    animation: sun-pulse 4s infinite alternate;
+}
+
+@keyframes sun-pulse {
+    0% { transform: scale(1); box-shadow: 0 0 30px #ffca28; }
+    100% { transform: scale(1.1); box-shadow: 0 0 50px #ffca28; }
+}
+
+.rainbow-svg {
+    width: 100%;
+    max-width: 400px;
+    height: 100%;
+}
+
+.rainbow-arc {
+    fill: none;
+    stroke-width: 15;
+    stroke-linecap: round;
+    stroke: var(--color-grey);
+    /* Animation setup for filling in */
+    stroke-dasharray: 1000; 
+    stroke-dashoffset: 1000;
+    transition: stroke 0.5s ease;
+}
+
+/* Class added by JS to trigger animation */
+.rainbow-arc.animate-fill {
+    animation: draw-rainbow 2s forwards ease-out;
+}
+
+@keyframes draw-rainbow {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+/* Main Content Layout */
+#app-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 600px) {
+  #app-content {
+    grid-template-columns: 1fr;
+  }
+}
 
 .card {
-  background: var(--card-bg);
+  background: white;
+  padding: 20px;
   border-radius: 15px;
-  padding: 30px;
-  margin-bottom: 20px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
-.lyrics-display {
-  font-size: 1.8rem;
-  font-weight: bold;
-  background: #f0f4f8;
-  padding: 20px;
-  border-radius: 10px;
+.card-header h2, .card-header h3 {
+  margin: 0;
+  color: #555;
+}
+
+.lyrics-text {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: #444;
+  min-height: 100px;
+}
+
+.teacher-response {
+  font-size: 1.1rem;
+  color: #555;
+  font-style: italic;
   min-height: 80px;
+  border-left: 4px solid var(--primary-color);
+  padding-left: 15px;
 }
 
 .controls {
   display: flex;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin-top: 20px;
+  gap: 10px;
 }
 
-.btn {
-  font-size: 1.5rem;
-  padding: 15px 30px;
+.btn-control {
+  flex: 1;
+  padding: 15px;
   border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  transition: transform 0.2s, opacity 0.2s;
+  border-radius: 10px;
+  font-size: 1rem;
   font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.btn:active { transform: scale(0.95); }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-.btn.primary { background: var(--primary); color: white; }
-.btn.secondary { background: var(--secondary); color: white; }
-.btn.success { background: var(--success); color: white; width: 100%; margin-top: 20px;}
-
-.btn.recording {
-  animation: pulse 1.5s infinite;
-  background: #e74c3c;
+.btn-control:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-.rainbow-container {
-  margin: 30px auto;
-  max-width: 400px;
+.btn-control:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-.arc {
-  fill: none;
-  stroke: var(--gray);
-  stroke-width: 15;
-  stroke-linecap: round;
-  transition: stroke 1s ease-in-out;
+.play-btn {
+  background-color: var(--primary-color);
+  color: white;
 }
 
-#ai-response {
-  font-size: 1.5rem;
-  font-style: italic;
+.speak-btn {
+  background-color: #9b59b6; /* Purple */
+  color: white;
 }
 
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+.next-btn {
+  background-color: var(--color-grey); /* Starts grey */
+  color: white;
+  margin-top: auto;
+}
+
+/* Class added by JS when color is unlocked */
+.next-btn.color-unlocked {
+    background-color: var(--success-color);
 }
