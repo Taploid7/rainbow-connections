@@ -1,81 +1,29 @@
 :root {
   --bg-color: #f9f7f1;
-  --text-color: #2c3e50;
-  --card-bg: #ffffff;
-  /* Gradients */
-  --grad-primary: linear-gradient(135deg, #4a90e2, #63a4ff);
-  --grad-secondary: linear-gradient(135deg, #e67e22, #f59e55);
-  --grad-success: linear-gradient(135deg, #27ae60, #2ecc71);
-  --grad-danger: linear-gradient(135deg, #e74c3c, #ff7675);
+  --primary: #4a90e2;
+  --secondary: #e67e22;
+  --success: #27ae60;
+  --gray: #bdc3c7;
 }
 
-body {
-  font-family: 'Fredoka One', 'Segoe UI', sans-serif; /* Added Fredoka if available */
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  line-height: 1.6;
-  margin: 0;
-  padding: 20px;
+body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); padding: 20px; text-align: center; }
+
+/* FIX: Black Rainbow -> Transparent Rainbow */
+.arc { 
+    fill: none; 
+    stroke: var(--gray); 
+    stroke-width: 15; 
+    stroke-linecap: round; 
+    transition: stroke 0.5s ease; 
 }
 
-/* 1. Animate the Rainbow */
-.arc {
-  fill: none;
-  stroke: #bdc3c7;
-  stroke-width: 15;
-  stroke-linecap: round;
-  /* This creates the "drawing" effect */
-  stroke-dasharray: 1000;
-  stroke-dashoffset: 1000;
-  animation: drawRainbow 2s ease-out forwards;
-}
+.card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); margin: 20px auto; max-width: 600px; }
 
-@keyframes drawRainbow {
-  to { stroke-dashoffset: 0; stroke: #4a90e2; } /* Changes color as it draws */
-}
+.btn { font-size: 1.2rem; padding: 15px 30px; border: none; border-radius: 50px; cursor: pointer; transition: 0.3s; color: white; font-weight: bold; }
+.btn:hover { transform: scale(1.05); }
+.primary { background: var(--primary); }
+.secondary { background: var(--secondary); }
+.success { background: var(--success); width: 100%; margin-top: 20px; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* 2. Buttons with Gradients & "Pop" */
-.btn {
-  font-size: 1.5rem;
-  padding: 15px 30px;
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  color: white;
-  font-weight: bold;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Springy transition */
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-.btn:hover {
-  transform: translateY(-5px) scale(1.05);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-}
-
-.btn:active { transform: translateY(0) scale(0.95); }
-
-.btn.primary { background: var(--grad-primary); }
-.btn.secondary { background: var(--grad-secondary); }
-.btn.success { background: var(--grad-success); width: 100%; margin-top: 20px; }
-
-/* 3. The "Alive" Pulse Animation */
-.btn.recording {
-  background: var(--grad-danger);
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
-  70% { box-shadow: 0 0 0 20px rgba(231, 76, 60, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
-}
-
-/* Card Polish */
-.card {
-  background: var(--card-bg);
-  border-radius: 25px; /* Softer corners */
-  padding: 30px;
-  margin-bottom: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-  border: 1px solid rgba(255,255,255,0.3);
-}
+.lyrics-display { font-size: 1.5rem; font-weight: bold; padding: 20px; background: #f0f4f8; border-radius: 10px; }
