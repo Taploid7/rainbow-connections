@@ -4,47 +4,47 @@
   "sections": [
     {
       "id": 1,
-      "name": "Verse 1",
+      "name": "Verse 1 (第一段)",
       "start": 2.8,
       "end": 15,
       "lyrics": "Why are there so many songs about rainbows? What's on the other side?",
-      "difficulty": "easy",
-      "memory_prompt": "Have you ever seen a double rainbow? What do rainbows make you think of?"
+      "funFact": "彩虹其實是完整的圓形！因為地面阻擋，我們平時才只能看到半圓。",
+      "memory_prompt": "Have you ever seen a double rainbow?"
     },
     {
       "id": 2,
-      "name": "Verse 2",
+      "name": "Verse 2 (第二段)",
       "start": 70.635,
       "end": 91,
-      "lyrics": "And someone believed it. And look what it's done so far. What's so amazing that keeps us stargazing? And what do we think we might see?",
-      "difficulty": "easy",
-      "memory_prompt": "Did you ever stargaze when you were younger? Who were you with?"
+      "lyrics": "And someone believed it. And look what it's done so far. What's so amazing that keeps us stargazing?",
+      "funFact": "觀星就像在進行時間旅行！因為星星離我們太遠，我們現在看到的星光是來自多年前的。",
+      "memory_prompt": "Did you ever stargaze when you were younger?"
     },
     {
       "id": 3,
-      "name": "Chorus",
+      "name": "Chorus (副歌)",
       "start": 92.54,
       "end": 98,
       "lyrics": "Someday we'll find it, the rainbow connection. The lovers, the dreamers and me.",
-      "difficulty": "medium",
+      "funFact": "「夢想家 (Dreamer)」這個詞源自古語，意指「喜悅」與「音樂」，非常適合這首歌。",
       "memory_prompt": "Who is the biggest dreamer you've ever known?"
     },
     {
       "id": 4,
-      "name": "Bridge",
+      "name": "Bridge (過門)",
       "start": 107.56,
       "end": 115,
       "lyrics": "All of us under its spell. We know that it's probably magic.",
-      "difficulty": "medium",
+      "funFact": "魔法本質上就是我們尚未完全理解的科學。古人常將彩虹的形成視為一種神祕力量。",
       "memory_prompt": "Do you remember a time when something felt truly magical?"
     },
     {
       "id": 5,
-      "name": "Verse 3",
+      "name": "Verse 3 (第三段)",
       "start": 114.2,
       "end": 137,
-      "lyrics": "Have you been half asleep? And have you heard voices? I've heard them calling my name. Is this the sweet sound that calms the young sailors? The voice might be one in the...",
-      "difficulty": "easy",
+      "lyrics": "Have you been half asleep? And have you heard voices? Is this the sweet sound that calms the young sailors?",
+      "funFact": "在古老的航海傳說中，水手聽到的歌聲往往是風與水流過礁石產生的自然聲響。",
       "memory_prompt": "What sweet sounds or music always bring you comfort?"
     }
   ]

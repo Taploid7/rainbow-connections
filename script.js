@@ -1,132 +1,88 @@
-// --- Global State ---
-let songData = null;
-let currentSectionIndex = 0;
-let audioObj = null;
+let songData = null, currentSectionIndex = 0, audioObj = null;
 
 const ui = {
-  appContent: document.getElementById('app-content'),
   btnPlay: document.getElementById('btn-play'),
-  btnMic: document.getElementById('btn-mic'),
   btnNext: document.getElementById('btn-next'),
   aiResponse: document.getElementById('ai-response'),
   title: document.getElementById('section-title'),
-  lyrics: document.getElementById('section-lyrics')
+  lyrics: document.getElementById('section-lyrics'),
+  appContent: document.getElementById('app-content')
 };
 
-// --- Initialization ---
 async function init() {
-  try {
-    const res = await fetch('lyrics.json');
-    songData = await res.json();
-    
-    // Create audio object
-    audioObj = new Audio(songData.audio);
-
-    ui.appContent.style.display = 'block';
-    loadSection(0);
-  } catch (err) {
-    console.error("Initialization error:", err);
-    ui.aiResponse.innerText = "Error loading data. Please check your JSON file.";
-  }
+  const res = await fetch('lyrics.json');
+  songData = await res.json();
+  audioObj = new Audio(songData.audio);
+  loadSection(0);
 }
 
-// --- Section Manager ---
 function loadSection(index) {
+  currentSectionIndex = index;
   const section = songData.sections[index];
   
-  // Set UI elements with fallbacks
-  ui.title.innerText = section.name || `Part ${index + 1}`;
-  ui.lyrics.innerText = section.lyrics || "No lyrics available.";
-  ui.aiResponse.innerText = "Press Play to listen! / 按下播放來聆聽！";
+  ui.title.innerText = section.name;
+  ui.lyrics.innerText = section.lyrics;
+  ui.aiResponse.innerText = `💡 小知識: ${section.funFact}`;
   
-  // Reset buttons
   ui.btnNext.disabled = true;
   ui.btnPlay.disabled = false;
-  ui.btnPlay.innerText = "Play / 播放";
+  ui.btnPlay.innerText = "播放 / Play";
 }
 
-// --- Audio Playback with Watchdog (stops at section.end) ---
-ui.btnPlay.onclick = () => {
-  if (!audioObj) return;
-  const section = songData.sections[currentSectionIndex];
-  
-  audioObj.currentTime = section.start;
+function playSection(index) {
+  audioObj.pause();
+  currentSectionIndex = index;
+  loadSection(index);
+  audioObj.currentTime = songData.sections[index].start;
   audioObj.play();
   
-  ui.btnPlay.innerText = "Playing... / 播放中...";
-  ui.btnPlay.disabled = true;
-
-  // Watchdog function to stop audio at the end timestamp
   const checkTime = () => {
-    if (audioObj.currentTime >= section.end) {
+    if (audioObj.currentTime >= songData.sections[index].end) {
       audioObj.pause();
-      audioObj.removeEventListener('timeupdate', checkTime); // Stop the watcher
-      
-      ui.btnPlay.innerText = "Play / 播放";
-      ui.btnPlay.disabled = false;
-      ui.btnNext.disabled = false; // Enable next section
+      audioObj.removeEventListener('timeupdate', checkTime);
+      ui.btnNext.disabled = false;
     }
   };
-
   audioObj.addEventListener('timeupdate', checkTime);
-};
+}
 
-// --- Progress Logic ---
+ui.btnPlay.onclick = () => playSection(currentSectionIndex);
+
 ui.btnNext.onclick = () => {
-  // 1. Trigger Rainbow Animation
   const arc = document.getElementById(`arc-${currentSectionIndex}`);
-  if (arc) {
-    arc.classList.add('drawing'); // Triggers the CSS animation
+  if(arc) {
+    arc.classList.add('drawing');
     arc.style.stroke = ['#ff7675', '#fd9644', '#f1c40f', '#2ecc71', '#0984e3'][currentSectionIndex % 5];
   }
-
-  // 2. Advance section
-  currentSectionIndex++;
   
-  if (currentSectionIndex < songData.sections.length) {
+  currentSectionIndex++;
+  if(currentSectionIndex < songData.sections.length) {
     loadSection(currentSectionIndex);
   } else {
-    ui.btnNext.innerText = "Journey Complete! / 旅程結束！";
-    ui.btnNext.disabled = true;
+    showRestartMenu();
   }
 };
 
-// --- AI Interaction ---
-ui.btnMic.onclick = () => {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) return alert("Browser not supported.");
+function showRestartMenu() {
+  ui.lyrics.innerText = "旅程已完成。您想再去聽聽哪一段呢？";
+  ui.aiResponse.innerText = "太棒了！請選擇一個段落重新欣賞。";
+  ui.btnNext.style.display = 'none';
   
-  const rec = new SpeechRecognition();
-  rec.lang = 'en-US';
-  ui.aiResponse.innerText = "Listening... / 聆聽中...";
-  rec.start();
+  const menu = document.createElement('div');
+  menu.className = 'controls';
   
-  rec.onresult = (e) => sendToAI(e.results[0][0].transcript);
-};
-
-async function sendToAI(userText) {
-  try {
-    const res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        userMessage: userText, 
-        sectionLyrics: songData.sections[currentSectionIndex].lyrics,
-        memory_prompt: songData.sections[currentSectionIndex].memory_prompt 
-      })
-    });
-    
-    const data = await res.json();
-    ui.aiResponse.innerText = data.reply;
-    
-    // Voice output
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(data.reply);
-    window.speechSynthesis.speak(utterance);
-    
-  } catch (err) { 
-    ui.aiResponse.innerText = "Lovely effort! Keep singing.";
-  }
+  songData.sections.forEach((section, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'btn secondary';
+    btn.innerText = section.name;
+    btn.onclick = () => {
+      menu.remove();
+      ui.btnNext.style.display = 'block';
+      playSection(idx);
+    };
+    menu.appendChild(btn);
+  });
+  ui.appContent.appendChild(menu);
 }
 
 document.addEventListener('DOMContentLoaded', init);
