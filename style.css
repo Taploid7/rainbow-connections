@@ -6,7 +6,6 @@
   --primary: #4a90e2;
   --secondary: #e67e22;
   --success: #27ae60;
-  --danger: #e74c3c;
   --gray: #bdc3c7;
   /* Gradients */
   --grad-primary: linear-gradient(135deg, #4a90e2, #63a4ff);
@@ -21,28 +20,34 @@ body {
   line-height: 1.6;
   margin: 0;
   padding: 20px;
+  text-align: center;
 }
 
-.container { max-width: 800px; margin: 0 auto; text-align: center; }
+.container { max-width: 800px; margin: 0 auto; }
 
 /* 2. Rainbow SVG Styles */
 .rainbow-container { margin: 30px auto; max-width: 400px; }
 
 .arc {
-  fill: none; /* FIX: Removes the black background */
-  stroke: var(--gray);
+  fill: none;
+  stroke: var(--gray); /* Always visible by default */
   stroke-width: 15;
   stroke-linecap: round;
+  transition: stroke 0.5s ease;
+}
+
+/* Add this class via JS to trigger the draw animation */
+.arc.drawing {
   stroke-dasharray: 1000;
   stroke-dashoffset: 1000;
-  transition: stroke 0.5s ease;
+  animation: drawRainbow 2s ease-out forwards;
 }
 
 @keyframes drawRainbow {
   to { stroke-dashoffset: 0; }
 }
 
-/* 3. Cards & Text */
+/* 3. Cards */
 .card {
   background: var(--card-bg);
   border-radius: 20px;
@@ -57,7 +62,6 @@ body {
   background: #f0f4f8;
   padding: 20px;
   border-radius: 10px;
-  min-height: 80px;
   margin: 20px 0;
 }
 
@@ -84,7 +88,7 @@ body {
 .secondary { background: var(--grad-secondary); }
 .success { background: var(--grad-success); width: 100%; margin-top: 20px; }
 
-/* 5. Pulse Animation */
+/* 5. Pulse Animation for Recording */
 .recording { animation: pulse 1.5s infinite; background: #e74c3c; }
 
 @keyframes pulse {
