@@ -1,5 +1,5 @@
 const API_URL = '/api/chat';
-const rainbowColors = ['#e67e22', '#f1c40f', '#2ecc71', '#3498db', '#9b59b6']; 
+const rainbowColors = ['#ff7675', '#fd9644', '#f1c40f', '#2ecc71', '#0984e3'];
 let songData = null, currentSectionIndex = 0, audioObj = null;
 
 const ui = {
@@ -13,21 +13,29 @@ const ui = {
 };
 
 async function init() {
-  const res = await fetch('lyrics.json');
-  songData = await res.json();
-  audioObj = new Audio(songData.audio);
-  
-  audioObj.onended = () => {
-    ui.btnPlay.innerText = "Play / 播放";
-    ui.btnPlay.disabled = false;
-    if (currentSectionIndex < songData.sections.length) {
-        ui.btnNext.disabled = false;
-        ui.btnNext.classList.add('color-unlocked');
-    }
-  };
+  try {
+    const res = await fetch('lyrics.json');
+    songData = await res.json();
+    audioObj = new Audio(songData.audio);
+    
+    audioObj.onended = () => {
+      ui.btnPlay.innerText = "Play / 播放";
+      ui.btnPlay.disabled = false;
+      // Only unlock next button if there is more song to play
+      if (currentSectionIndex < songData.sections.length - 1) {
+          ui.btnNext.disabled = false;
+          ui.btnNext.classList.add('color-unlocked');
+      } else {
+          ui.btnNext.disabled = false; // Last section
+          ui.btnNext.innerText = "Finish / 完成";
+      }
+    };
 
-  ui.appContent.style.display = 'grid';
-  loadSection(0);
+    ui.appContent.style.display = 'grid';
+    loadSection(0);
+  } catch (err) {
+    console.error("Initialization error:", err);
+  }
 }
 
 function loadSection(index) {
@@ -35,62 +43,83 @@ function loadSection(index) {
   ui.btnNext.disabled = true;
   ui.btnNext.classList.remove('color-unlocked');
   ui.btnPlay.disabled = false;
-  
   ui.title.innerText = `Part ${index + 1} / 第一部分`;
   ui.lyrics.innerText = section.lyrics;
   
-  speak(`Welcome to part ${index + 1}. ${section.chineseFunFact} ${section.memory_prompt}`);
+  // Clean up undefined text
+  const funFact = section.chineseFunFact || "";
+  const prompt = section.memory_prompt || "";
+  const teachingText = `${funFact} ${prompt}`;
+  
+  ui.aiResponse.innerText = teachingText;
+  speak(teachingText);
 }
 
 ui.btnPlay.onclick = () => {
+  if (!audioObj) return;
   audioObj.currentTime = songData.sections[currentSectionIndex].start;
   audioObj.play();
   ui.btnPlay.innerText = "Playing... / 播放中...";
   ui.btnPlay.disabled = true;
   ui.btnNext.disabled = true;
-  ui.btnNext.classList.remove('color-unlocked');
+};
+
+ui.btnNext.onclick = () => {
+  // 1. Trigger Animation for the CURRENT arc
+  const arc = document.getElementById(`arc-${currentSectionIndex}`);
+  if (arc) {
+    arc.style.animation = 'none';
+    void arc.offsetWidth; // Trigger reflow to restart CSS animation
+    arc.style.animation = 'drawRainbow 2s ease-out forwards';
+    arc.style.stroke = rainbowColors[currentSectionIndex];
+  }
+
+  // 2. Advance to next section
+  currentSectionIndex++;
+  
+  if (currentSectionIndex < songData.sections.length) {
+    loadSection(currentSectionIndex);
+  } else {
+    ui.btnNext.innerText = "Journey Complete! / 旅程結束！";
+    ui.btnNext.disabled = true;
+  }
 };
 
 ui.btnMic.onclick = () => {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) return alert("Not supported");
+  if (!SpeechRecognition) return alert("Browser not supported");
+  
   const rec = new SpeechRecognition();
   rec.lang = 'en-US';
   ui.aiResponse.innerText = "Listening... / 聆聽中...";
   rec.start();
+  
   rec.onresult = (e) => sendToAI(e.results[0][0].transcript);
 };
 
-ui.btnNext.onclick = () => {
-  const arc = document.getElementById(`arc-${currentSectionIndex}`);
-  arc.style.stroke = rainbowColors[currentSectionIndex];
-  arc.classList.add('color-active');
-  
-  currentSectionIndex++;
-  if (currentSectionIndex < songData.sections.length) {
-    loadSection(currentSectionIndex);
-  } else {
-    ui.btnNext.innerText = "Finished / 完成";
-  }
-};
-
 async function sendToAI(userText) {
-  ui.aiResponse.innerText = "Teacher is thinking... / 老師正在思考...";
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userMessage: userText, sectionLyrics: songData.sections[currentSectionIndex].lyrics })
+      body: JSON.stringify({ 
+        userMessage: userText, 
+        sectionLyrics: songData.sections[currentSectionIndex].lyrics,
+        funFact: songData.sections[currentSectionIndex].chineseFunFact 
+      })
     });
     const data = await res.json();
-    speak("Great effort! " + data.reply);
-  } catch (err) {
-    speak("I heard you! That was lovely.");
+    ui.aiResponse.innerText = data.reply;
+    speak(data.reply);
+  } catch (err) { 
+    ui.aiResponse.innerText = "Lovely effort! Keep going.";
+    speak("Lovely effort! Keep going.");
   }
 }
 
 function speak(text) {
-  ui.aiResponse.innerText = text;
+  // Stop previous speech if any
+  window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   window.speechSynthesis.speak(utterance);
 }
