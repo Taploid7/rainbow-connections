@@ -3,20 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rainbow Connections</title>
+  <title>Rainbow Connections / 彩虹歌曲教學</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
-    <header><h1>Rainbow Connections: Learn the Song!</h1><p id="teacher-status">Loading song...</p></header>
+    <header>
+        <h1>Rainbow Connections AI Teacher / 彩虹歌曲教學</h1>
+        <p id="teacher-status">Loading song / 載入歌曲中...</p>
+    </header>
     <div class="rainbow-container">
-      <svg viewBox="0 0 200 100"><path id="arc-4" d="M 10 100 A 90 90 0 0 1 190 100" class="arc"/><path id="arc-3" d="M 30 100 A 70 70 0 0 1 170 100" class="arc"/><path id="arc-2" d="M 50 100 A 50 50 0 0 1 150 100" class="arc"/><path id="arc-1" d="M 70 100 A 30 30 0 0 1 130 100" class="arc"/><path id="arc-0" d="M 90 100 A 10 10 0 0 1 110 100" class="arc"/></svg>
+      <svg viewBox="0 0 200 100">
+        <path id="arc-4" d="M 10 100 A 90 90 0 0 1 190 100" class="arc"/>
+        <path id="arc-3" d="M 30 100 A 70 70 0 0 1 170 100" class="arc"/>
+        <path id="arc-2" d="M 50 100 A 50 50 0 0 1 150 100" class="arc"/>
+        <path id="arc-1" d="M 70 100 A 30 30 0 0 1 130 100" class="arc"/>
+        <path id="arc-0" d="M 90 100 A 10 10 0 0 1 110 100" class="arc"/>
+      </svg>
     </div>
     <main id="app-content" style="display: none;">
-      <div class="card"><h2 id="section-title"></h2><p id="section-lyrics"></p>
-        <div class="controls"><button id="btn-play" class="btn primary">🎵 Play</button><button id="btn-mic" class="btn secondary">🎤 Speak</button></div>
+      <div class="card">
+          <h2 id="section-title"></h2>
+          <p id="section-lyrics"></p>
+          <div class="controls">
+              <button id="btn-play" class="btn primary">Play / 播放</button>
+              <button id="btn-mic" class="btn secondary">Speak / 說話</button>
+          </div>
       </div>
-      <div class="card"><h3>Teacher:</h3><p id="ai-response"></p><button id="btn-next" class="btn success" disabled>⭐ Unlock Color</button></div>
+      <div class="card">
+          <h3>Teacher / 老師:</h3>
+          <p id="ai-response">Ready to start / 準備開始</p>
+          <button id="btn-next" class="btn success" disabled>Unlock Color / 解鎖顏色</button>
+      </div>
     </main>
   </div>
   <script src="script.js"></script>
