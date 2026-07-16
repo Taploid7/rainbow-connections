@@ -21,23 +21,23 @@ async function init() {
     audioObj = new Audio(songData.audio);
     
     audioObj.onerror = () => {
-        ui.status.innerText = "Error: File song.mp3 not found.";
+        ui.status.innerText = "Error: File song.mp3 not found. / 找不到 song.mp3";
     };
 
     ui.status.style.display = 'none';
     ui.appContent.style.display = 'grid';
     loadSection(0);
   } catch (e) { 
-    ui.status.innerText = "Error loading data."; 
+    ui.status.innerText = "Error loading data. / 載入錯誤。"; 
     console.error(e);
   }
 }
 
 function loadSection(index) {
   const section = songData.sections[index];
-  ui.title.innerText = "Part " + (index + 1);
+  ui.title.innerText = "Part " + (index + 1) + " / 第一部分";
   ui.lyrics.innerText = section.lyrics;
-  ui.btnNext.innerText = "Unlock Next Color (" + (index + 1) + "/5)";
+  ui.btnNext.innerText = "Unlock Next Color (" + (index + 1) + "/5) / 解鎖下一個顏色";
   ui.btnNext.disabled = true;
   ui.btnNext.classList.remove('color-unlocked');
   ui.sun.style.background = "radial-gradient(circle, #fff 0%, " + rainbowColors[index] + " 70%)";
@@ -49,13 +49,13 @@ ui.btnPlay.onclick = () => {
   const section = songData.sections[currentSectionIndex];
   audioObj.currentTime = section.start;
   audioObj.play();
-  ui.btnPlay.innerText = "Playing...";
+  ui.btnPlay.innerText = "Playing... / 播放中...";
   ui.btnPlay.disabled = true;
   
   setTimeout(() => { 
       audioObj.pause(); 
       ui.btnNext.disabled = false; 
-      ui.btnPlay.innerText = "Play Section";
+      ui.btnPlay.innerText = "Play Section / 播放片段";
       ui.btnPlay.disabled = false;
   }, (section.end - section.start) * 1000);
 };
@@ -70,18 +70,25 @@ ui.btnNext.onclick = () => {
   if (currentSectionIndex < songData.sections.length) {
       setTimeout(() => loadSection(currentSectionIndex), 1500);
   } else {
-      ui.btnNext.innerText = "Song Finished!";
+      ui.btnNext.innerText = "Song Finished! / 歌曲結束！";
       ui.btnNext.classList.add('color-unlocked');
       ui.btnNext.disabled = true;
-      speak("You have completed the whole song. Well done.");
+      speak("You have completed the whole song. Well done. / 你完成了整首歌。做得好。");
   }
 };
 
 async function sendToAI(userText) {
-  ui.aiResponse.innerText = "Teacher is thinking...";
-  const section = songData.sections[currentSectionIndex];
+  ui.aiResponse.innerText = "Teacher is thinking... / 老師正在思考...";
   
+  const backupResponses = [
+    "That is a wonderful thought. Tell me more about it.",
+    "I love hearing your perspective on that.",
+    "That sounds very special. Please continue.",
+    "I am listening. What else is on your mind?"
+  ];
+
   try {
+    const section = songData.sections[currentSectionIndex];
     const res = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -93,11 +100,13 @@ async function sendToAI(userText) {
       })
     });
     
+    if (!res.ok) throw new Error("API failed");
     const data = await res.json();
     speak(data.reply);
   } catch (err) {
     console.error(err);
-    speak("I am having trouble thinking right now, but you are doing wonderfully.");
+    const fallback = backupResponses[Math.floor(Math.random() * backupResponses.length)];
+    speak(fallback + " (I am having trouble connecting to my brain right now, but you are doing great!)");
   }
 }
 
@@ -105,7 +114,7 @@ function speak(text) {
   ui.aiResponse.innerText = text;
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.rate = 0.9;
-  utterance.lang = 'en-US'; // Set to native English
+  utterance.lang = 'en-US';
   window.speechSynthesis.speak(utterance);
 }
 
@@ -113,14 +122,14 @@ function setupSpeechRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
         const rec = new SpeechRecognition();
-        rec.lang = 'en-US'; // Expecting English input from the user
+        rec.lang = 'en-US';
         ui.btnMic.onclick = () => {
-            ui.aiResponse.innerText = "Listening...";
+            ui.aiResponse.innerText = "Listening... / 聆聽中...";
             rec.start();
         };
         rec.onresult = (e) => sendToAI(e.results[0][0].transcript);
     } else {
-        ui.btnMic.innerText = "Mic Not Supported";
+        ui.btnMic.innerText = "Mic Not Supported / 不支援麥克風";
         ui.btnMic.disabled = true;
     }
 }
